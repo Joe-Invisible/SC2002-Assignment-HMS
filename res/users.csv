@@ -1,0 +1,9 @@
+ID,Name,Role,BirthDate,Gender,Age,Blood Type,Email,Phone
+1000,Alice Brown,Patient,14/5/1980,Female,1234,A+,clice.blue@example.com,123-1237980
+1002,Bob Stone,Doctor,23/11/1976,Male,5678,B+,bob.paper@example.com,999-999999
+2000,Jay Gay,Doctor,32/12/1587,Male,587,A+,-,-
+3000,Sad Man,Patient,31/22/1234,Male,28,O-,-,-
+1234,Add User Test,Pharmacist,1/2/2024,Female,0,B+,test.user@example.com,123-0123412
+5678,Joe Joe,Patient,00/00/0000,Male,1234,S+,joe.joe@example.com,000-0000000
+9999,Admin,Administrator,22/10/1989,Female,47,O+,admin@example.com,000-0000000
+1004,Charlie White,Patient,42/31/1000,Female,256,B+,-,-
