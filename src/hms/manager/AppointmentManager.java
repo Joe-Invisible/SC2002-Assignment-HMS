@@ -56,7 +56,7 @@ public class AppointmentManager extends HospitalResourceManager {
 
    private AppointmentManager() throws Exception {
       appointmentTableHandler = new TableHandler(
-         	"/Users/adisontan/Downloads/Hospital Management System/res/patientAppointments.csv", 
+         	"./res/patientAppointments.csv", 
          	Arrays.asList(
          		APPOINTMENTID, PATIENTID, DAY, MONTH, YEAR, TIMESLOT, STATUS, DOCTORID, DIAGNOSES,
          		TREATMENTS, TYPE_OF_SERVICE, MEDICATIONS, PRESCRIPTION_STATUS, 
@@ -66,7 +66,7 @@ public class AppointmentManager extends HospitalResourceManager {
          );
    
       doctorAppointmentTableHandler = new TableHandler(
-         	"/Users/adisontan/Downloads/Hospital Management System/res/doctorSchedule.csv",
+         	"./res/doctorSchedule.csv",
          	Arrays.asList(
          			SCHEDULEID, DOCTORID, DAY, MONTH, YEAR, 
          			TIMESLOT, STATUS, APPOINTMENT, PATIENTID, APPOINTMENTID
