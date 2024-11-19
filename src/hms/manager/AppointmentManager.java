@@ -1507,7 +1507,8 @@ public class AppointmentManager extends HospitalResourceManager {
       String appointmentId = promptSelectAppointmentId();
       String[] medications = appointmentTableHandler.readVariable(appointmentId, MEDICATIONS).split(";");
       Boolean doPrescribe = true;
-      if (!"NA".equals(medications[0])) {
+      
+      if (!"NA".equals(medications[0]) && !"Dispensed".equals(appointmentTableHandler.readVariable(appointmentId, PRESCRIPTION_STATUS))) {
          for (String medicine : medications) {
             int deductQty = Integer
                	.parseInt(appointmentTableHandler.readVariable(appointmentId, PRESCRIBED_QUANTITY));
@@ -1536,7 +1537,11 @@ public class AppointmentManager extends HospitalResourceManager {
          } else {
             System.out.println("Unable to dispense due to lack of medications");
          }
-      } else {
+      }
+      else if("Dispensed".equals(appointmentTableHandler.readVariable(appointmentId, PRESCRIPTION_STATUS))){
+         System.out.println("The medication has already been dispensed.");
+      } 
+      else {
          System.out.println("There is no medication to dispense");
       }
    }

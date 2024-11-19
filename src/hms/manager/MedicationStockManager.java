@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.lang.model.type.NullType;
+
 import hms.HospitalManagementSystem;
 import hms.exception.TableMismatchException;
 import hms.exception.UndefinedVariableException;
@@ -175,6 +177,8 @@ public class MedicationStockManager extends HospitalResourceManager {
          	"Select Operation"
          ).pollUntilValid().getAnswerString();
    	
+      if(decision == null) return;
+
       if (decision.equals("Add Medicine")) {
          promptAddNewMedicineType();
          return;
