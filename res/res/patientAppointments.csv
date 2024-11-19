@@ -1,0 +1,5 @@
+AppointmentId,PatientId,Day,Month,Year,Time Slot,Status,DoctorId,Diagnoses,Treatments,Type Of Service,Medication,Prescription Status,Prescribed Quantity
+'32825845842925698533,1000,4,November,2024,8:00,Completed,1002,Diabetes;Dementia;Tubercolosis;,Pilates;Hydrate Well;,Injection;,Insulin;Panadol;,Dispensed,1
+'10001002202411181400,1000,18,December,2024,14:00,Confirmed,1002,NA,NA,NA,NA,NA,NA
+'10001002202410201200C1731943146C1732015881,1000,28,November,2024,12:00,Cancelled,1002,NA,NA,NA,NA,NA,NA
+'100025478638424732856C1732015946,1000,24,November,2024,10:00,Cancelled,1002,NA,NA,NA,NA,NA,NA

@@ -1,0 +1,10 @@
+ID,Role
+1000,Patient
+1002,Doctor
+2000,Doctor
+3000,Patient
+1234,Pharmacist
+5678,Patient
+9999,Administrator
+9998,Administrator
+1004,Patient
