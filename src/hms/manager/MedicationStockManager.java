@@ -38,7 +38,7 @@ public class MedicationStockManager extends HospitalResourceManager {
     * @throws Exception if there is an error in initializing the table handler
     */
    private MedicationStockManager() throws Exception {
-      medicineTableHandler = new TableHandler("./res/medicineList.csv",
+      medicineTableHandler = new TableHandler("/Users/adisontan/Downloads/Hospital Management System/res/medicineList.csv",
          	Arrays.asList(MEDICINE_NAME, INITIAL_STOCK, LOW_STOCK_LEVEL_ALERT, REPLENISHMENT_REQUEST), 0);
    
       msmInstance = this;
@@ -177,8 +177,9 @@ public class MedicationStockManager extends HospitalResourceManager {
          	"Select Operation"
          ).pollUntilValid().getAnswerString();
    	
-      if(decision == null) return;
-
+      if(decision == null) 
+         return;
+   
       if (decision.equals("Add Medicine")) {
          promptAddNewMedicineType();
          return;
@@ -286,11 +287,14 @@ public class MedicationStockManager extends HospitalResourceManager {
          	.setValidator(s -> MedicationStockManager.isExistentMedicine(s))
          	// end input session
          	.startPrompt();
+      if (medicineId == null){
+         return;
+      }
       medicineTableHandler.updateVariable(medicineId, REPLENISHMENT_REQUEST, "Pending");
       System.out.println(medicineId + "'s replenishment has been requested.");
       viewMedicineList();
    }
-	
+   
    /**
     * Verifies if a given medicine exists in the csv.
     */

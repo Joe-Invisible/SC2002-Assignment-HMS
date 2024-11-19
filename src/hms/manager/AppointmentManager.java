@@ -56,7 +56,7 @@ public class AppointmentManager extends HospitalResourceManager {
 
    private AppointmentManager() throws Exception {
       appointmentTableHandler = new TableHandler(
-         	"./res/patientAppointments.csv", 
+         	"/Users/adisontan/Downloads/Hospital Management System/res/patientAppointments.csv", 
          	Arrays.asList(
          		APPOINTMENTID, PATIENTID, DAY, MONTH, YEAR, TIMESLOT, STATUS, DOCTORID, DIAGNOSES,
          		TREATMENTS, TYPE_OF_SERVICE, MEDICATIONS, PRESCRIPTION_STATUS, 
@@ -66,7 +66,7 @@ public class AppointmentManager extends HospitalResourceManager {
          );
    
       doctorAppointmentTableHandler = new TableHandler(
-         	"./res/doctorSchedule.csv",
+         	"/Users/adisontan/Downloads/Hospital Management System/res/doctorSchedule.csv",
          	Arrays.asList(
          			SCHEDULEID, DOCTORID, DAY, MONTH, YEAR, 
          			TIMESLOT, STATUS, APPOINTMENT, PATIENTID, APPOINTMENTID
@@ -365,8 +365,8 @@ public class AppointmentManager extends HospitalResourceManager {
       }
    	
       List<String> formattedSlots = new ArrayList<String>();
-//      List<String> requiredColumns = Arrays.asList(DOCTORID, DAY, MONTH, YEAR, TIMESLOT);
-//      int doctorIdIndex = requiredColumns.indexOf(DOCTORID);
+   //      List<String> requiredColumns = Arrays.asList(DOCTORID, DAY, MONTH, YEAR, TIMESLOT);
+   //      int doctorIdIndex = requiredColumns.indexOf(DOCTORID);
       
       for (List<String> row : sortFullColumnQueryResultByTime(doctorAppointmentTableHandler, availableSlots)) {
          String format = "Doctor Name:\t" + UserManager.getName(doctorAppointmentTableHandler.getFromList(row, DOCTORID))
@@ -538,7 +538,7 @@ public class AppointmentManager extends HospitalResourceManager {
    	
    	// flatten list
       List<String> appointmentIds = sortAppointmentIdByDate(appointmentTableHandler, queryResult.stream().map(r -> r.getFirst()).toList());
-      List<String> requiredColumns = Arrays.asList(TYPE_OF_SERVICE, MEDICATIONS, DIAGNOSES);
+      List<String> requiredColumns = Arrays.asList(TYPE_OF_SERVICE, MEDICATIONS, DIAGNOSES, TREATMENTS);
    	// query row only has one column, that is the appointmentId
       for (String appointmentId : appointmentIds) {
       	
@@ -862,7 +862,7 @@ public class AppointmentManager extends HospitalResourceManager {
    	
       List<String> consultationInfoFormatted = new ArrayList<>();
       for (List<String> row : sortFullColumnQueryResultByTime(appointmentTableHandler, appointmentInfo)) {
-         String format = "Patient ID:\t" + appointmentTableHandler.getFromList(row, "PatientId")
+         String format = "\tPatient ID:\t" + appointmentTableHandler.getFromList(row, "PatientId")
                + "\n\t\tDate:\t" + appointmentTableHandler.getFromList(row, DAY) + " "
                + appointmentTableHandler.getFromList(row, MONTH) + " "
                + appointmentTableHandler.getFromList(row, YEAR) + "\n\t\tTime Slot:\t"
@@ -918,6 +918,9 @@ public class AppointmentManager extends HospitalResourceManager {
 	 */
    private static void promptUpdateDMT(String doctorId) throws Exception {
       String patientId = promptSelectPatientId();
+      if (patientId == null){
+         return;
+      }
    	// appointmentString returns the patient appointment info to edit
       List<String> appointmentString = getPatientDMTTimeSlots(patientId);
       if (appointmentString == null) {	// patient does not have completed appointments 
@@ -1056,7 +1059,10 @@ public class AppointmentManager extends HospitalResourceManager {
 	 */
    private static void writeAppointmentOutcome(String doctorId) throws Exception {
       String patientId = promptSelectPatientId();
-   	
+      if (patientId == null){
+         return;
+      }
+      
       List<List<String>> confirmedAppointments = doctorAppointmentTableHandler.new TableQuery(doctorAppointmentTableHandler.ALL_COLUMNS)
          .where(STATUS).matches("Confirmed")
          .and()
@@ -1074,11 +1080,11 @@ public class AppointmentManager extends HospitalResourceManager {
    
       List<String> confirmedAppointmentsFormatted = new ArrayList<>();
       for (List<String> row : confirmedAppointments) {
-         String format = "Patient ID:\t" + appointmentTableHandler.getFromList(row, "PatientId")
-               + "\n\t\tDate:\t" + appointmentTableHandler.getFromList(row, DAY) + " "
-               + appointmentTableHandler.getFromList(row, MONTH) + " "
-               + appointmentTableHandler.getFromList(row, YEAR) + "\n\t\tTime Slot:\t"
-               + appointmentTableHandler.getFromList(row, TIMESLOT);
+         String format = "Patient ID:\t" + doctorAppointmentTableHandler.getFromList(row, PATIENTID)
+               + "\n\t\tDate:\t" + doctorAppointmentTableHandler.getFromList(row, DAY) + " "
+               + doctorAppointmentTableHandler.getFromList(row, MONTH) + " "
+               + doctorAppointmentTableHandler.getFromList(row, YEAR) + "\n\t\tTime Slot:\t"
+               + doctorAppointmentTableHandler.getFromList(row, TIMESLOT);
          confirmedAppointmentsFormatted.add(format);
       }
    
@@ -1109,20 +1115,22 @@ public class AppointmentManager extends HospitalResourceManager {
       String day = doctorAppointmentTableHandler.getFromList(chosenAppointment, DAY);
       String timeSlot = doctorAppointmentTableHandler.getFromList(chosenAppointment, TIMESLOT);
    
-      String diagnosesNumberString = new PromptFormatter.InputSession<String>("Enter number of " + DIAGNOSES)
-         	.startPrompt();
-      if (diagnosesNumberString == null) {
+      Integer diagnosesCount = new PromptFormatter.InputSession<Integer>("Enter number of " + DIAGNOSES)
+           .setConverter(Integer::parseInt)
+           .setValidator(n -> n > 0)
+           .setOnInvalidInput("Input must be a number greater than zero!")
+           .startPrompt();
+      if (diagnosesCount == null) 
          return;
-      }
    
    	
    	// add diagnoses for newly completed appointments
       int valueIndex = -1;
-      int diagnosesNumberInt = Integer.parseInt(diagnosesNumberString);
+      
       List<String> diagnosesValue = new ArrayList<>();
-      for (int i = 0; i < diagnosesNumberInt; i++) {
+      for (int i = 0; i < diagnosesCount; i++) {
          diagnosesValue
-            	.add(new PromptFormatter.InputSession<String>("Please enter " + DIAGNOSES + " " + (i + 1) + "")
+            	.add(new PromptFormatter.InputSession<String>("Please enter " + DIAGNOSES + " " + (i + 1) + "", true)
             			.startPrompt());
       
          MedicalRecordModifier commandTarget = new MedicalRecordModifier("Add", DIAGNOSES, patientId, valueIndex,
@@ -1137,16 +1145,18 @@ public class AppointmentManager extends HospitalResourceManager {
    	
    
    	// add treatments for newly completed appointments
-      String treatmentsNumberString = new PromptFormatter.InputSession<String>("Enter number of " + TREATMENTS)
-         	.startPrompt();
-      if (treatmentsNumberString == null) {
+      Integer treatmentCount = new PromptFormatter.InputSession<Integer>("Enter number of " + TREATMENTS)
+           .setConverter(Integer::parseInt)
+           .setValidator(n -> n > 0)
+           .setOnInvalidInput("Input must be a number greater than zero!")
+           .startPrompt();
+      if (treatmentCount == null) 
          return;
-      }
-      int treatmentsNumberInt = Integer.parseInt(treatmentsNumberString);
+      
       List<String> treatmentsValue = new ArrayList<>();
-      for (int i = 0; i < treatmentsNumberInt; i++) {
+      for (int i = 0; i < treatmentCount; i++) {
          treatmentsValue
-            	.add(new PromptFormatter.InputSession<String>("Please enter " + TREATMENTS + " " + (i + 1) + "")
+            	.add(new PromptFormatter.InputSession<String>("Please enter " + TREATMENTS + " " + (i + 1) + "", true)
             			.startPrompt());
       
          MedicalRecordModifier commandTarget = new MedicalRecordModifier("Add", TREATMENTS, patientId, valueIndex,
@@ -1160,16 +1170,18 @@ public class AppointmentManager extends HospitalResourceManager {
       appointmentTableHandler.updateVariable(appointmentId, TREATMENTS, treatmentsCell);
    	
    	// add medications for newly completed appointments
-      String medicationsNumberString = new PromptFormatter.InputSession<String>("Enter number of " + MEDICATIONS)
-         	.startPrompt();
-      if (medicationsNumberString == null) {
+      Integer medicationCount = new PromptFormatter.InputSession<Integer>("Enter number of " + MEDICATIONS)
+           .setConverter(Integer::parseInt)
+           .setValidator(n -> n > 0)
+           .setOnInvalidInput("Input must be a number greater than zero!")
+           .startPrompt();
+      if (medicationCount == null) 
          return;
-      }
-      int medicationsNumberInt = Integer.parseInt(medicationsNumberString);
+      
       List<String> medicationsValue = new ArrayList<>();
-      for (int i = 0; i < medicationsNumberInt; i++) {
+      for (int i = 0; i < medicationCount; i++) {
          medicationsValue
-            	.add(new PromptFormatter.InputSession<String>("Please enter " + MEDICATIONS + " " + (i + 1) + "")
+            	.add(new PromptFormatter.InputSession<String>("Please enter " + MEDICATIONS + " " + (i + 1) + "", true)
             			.startPrompt());
                        
          MedicationStockModifier commandTarget1 = new MedicationStockModifier(medicationsValue.get(i), 1, false);
@@ -1193,16 +1205,18 @@ public class AppointmentManager extends HospitalResourceManager {
       appointmentTableHandler.updateVariable(appointmentId, MEDICATIONS, medicationsCell);
    	
    	// add type of service for newly completed appointments
-      String serviceNumberString = new PromptFormatter.InputSession<String>("Enter number of " + TYPE_OF_SERVICE)
-         	.startPrompt();
-      if (serviceNumberString == null) {
+      Integer serviceCount = new PromptFormatter.InputSession<Integer>("Enter number of " + TYPE_OF_SERVICE)
+           .setConverter(Integer::parseInt)
+           .setValidator(n -> n > 0)
+           .setOnInvalidInput("Input must be a number greater than zero!")
+           .startPrompt();
+      if (serviceCount == null) 
          return;
-      }
-      int serviceNumberInt = Integer.parseInt(serviceNumberString);
+      
       List<String> serviceValue = new ArrayList<>();
-      for (int i = 0; i < serviceNumberInt; i++) {
+      for (int i = 0; i < serviceCount; i++) {
          serviceValue.add(
-            	new PromptFormatter.InputSession<String>("Please enter " + TYPE_OF_SERVICE + " " + (i + 1) + "")
+            	new PromptFormatter.InputSession<String>("Please enter " + TYPE_OF_SERVICE + " " + (i + 1) + "", true)
             			.startPrompt());
       }
       String serviceCell = String.join(";", serviceValue);
@@ -1366,7 +1380,7 @@ public class AppointmentManager extends HospitalResourceManager {
 	 * @throws Exception if an error occurs during data retrieval, selection, or cancellation.
 	 */
    private static boolean cancelAppointment(String patientId) throws Exception {
-//      List<String> requiredColumns = Arrays.asList(DOCTORID, YEAR, MONTH, DAY, TIMESLOT);
+   //      List<String> requiredColumns = Arrays.asList(DOCTORID, YEAR, MONTH, DAY, TIMESLOT);
    	
       List<List<String>> confirmedAppointments = appointmentTableHandler.new TableQuery(
          	appointmentTableHandler.ALL_COLUMNS		// so that we can use getFromList
@@ -1505,6 +1519,9 @@ public class AppointmentManager extends HospitalResourceManager {
 	 */
    private static void updatePrescriptionStatus(String pharmacistId) throws Exception {
       String appointmentId = promptSelectAppointmentId();
+      if (appointmentId == null){
+         return;
+      }
       String[] medications = appointmentTableHandler.readVariable(appointmentId, MEDICATIONS).split(";");
       Boolean doPrescribe = true;
       
