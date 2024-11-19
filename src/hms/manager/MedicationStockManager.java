@@ -38,7 +38,7 @@ public class MedicationStockManager extends HospitalResourceManager {
     * @throws Exception if there is an error in initializing the table handler
     */
    private MedicationStockManager() throws Exception {
-      medicineTableHandler = new TableHandler("/Users/adisontan/Downloads/Hospital Management System/res/medicineList.csv",
+      medicineTableHandler = new TableHandler("./res/medicineList.csv",
          	Arrays.asList(MEDICINE_NAME, INITIAL_STOCK, LOW_STOCK_LEVEL_ALERT, REPLENISHMENT_REQUEST), 0);
    
       msmInstance = this;
